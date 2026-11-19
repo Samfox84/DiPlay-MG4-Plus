@@ -32,7 +32,7 @@ internal class ClusterTurnCardView(context: Context) : View(context) {
     private var yPercent = ClusterTurnCardOverlay.DEFAULT_Y_PERCENT
     private var sizePercent = ClusterTurnCardOverlay.DEFAULT_SIZE_PERCENT
 
-    private val accent = Color.rgb(10, 132, 255)
+    private val accent = Color.rgb(96, 134, 170)   // Calm: muted steel-blue (AuDHD), was bright iOS blue 10,132,255
     /** Card opacity as percent; 100 keeps the historical fully-opaque look available. */
     private var opacityPercent = 85
     private val glassPaint = Paint(Paint.ANTI_ALIAS_FLAG)
