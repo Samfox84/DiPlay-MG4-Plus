@@ -1021,4 +1021,6 @@
     <string name="settings_cluster_level_light">輕度</string>
     <string name="settings_cluster_level_medium">中度</string>
     <string name="settings_cluster_level_strong">強</string>
+    <string name="settings_cluster_warmth">儀表板地圖暖色</string>
+    <string name="settings_cluster_soft">柔化儀表板地圖</string>
 </resources>

@@ -961,4 +961,6 @@
     <string name="settings_cluster_level_light">Ligero</string>
     <string name="settings_cluster_level_medium">Medio</string>
     <string name="settings_cluster_level_strong">Fuerte</string>
+    <string name="settings_cluster_warmth">Mapa del cuadro más cálido</string>
+    <string name="settings_cluster_soft">Suavizar mapa del cuadro</string>
 </resources>

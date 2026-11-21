@@ -1057,4 +1057,6 @@
     <string name="settings_cluster_level_light">약하게</string>
     <string name="settings_cluster_level_medium">보통</string>
     <string name="settings_cluster_level_strong">강하게</string>
+    <string name="settings_cluster_warmth">계기판 지도 따뜻하게</string>
+    <string name="settings_cluster_soft">계기판 지도 부드럽게</string>
 </resources>

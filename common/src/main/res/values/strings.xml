@@ -1064,4 +1064,6 @@
     <string name="settings_cluster_level_light">Light</string>
     <string name="settings_cluster_level_medium">Medium</string>
     <string name="settings_cluster_level_strong">Strong</string>
+    <string name="settings_cluster_warmth">Warm cluster map</string>
+    <string name="settings_cluster_soft">Soften cluster map</string>
 </resources>

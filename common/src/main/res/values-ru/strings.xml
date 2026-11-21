@@ -961,4 +961,6 @@
     <string name="settings_cluster_level_light">Слабо</string>
     <string name="settings_cluster_level_medium">Средне</string>
     <string name="settings_cluster_level_strong">Сильно</string>
+    <string name="settings_cluster_warmth">Тёплая карта на панели приборов</string>
+    <string name="settings_cluster_soft">Смягчить карту на панели приборов</string>
 </resources>

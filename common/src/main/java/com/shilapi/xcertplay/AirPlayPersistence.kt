@@ -111,6 +111,8 @@ object AirPlayPersistence {
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_POSITION = "cluster_turn_card_overlay_position"
     private const val KEY_CLUSTER_GREYSCALE = "cluster_greyscale_percent"
     private const val KEY_CLUSTER_DIM = "cluster_dim_percent"
+    private const val KEY_CLUSTER_WARMTH = "cluster_warmth_percent"
+    private const val KEY_CLUSTER_SOFT = "cluster_soft_percent"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_SIZE = "cluster_turn_card_overlay_size"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_X = "cluster_turn_card_overlay_x_percent"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_Y = "cluster_turn_card_overlay_y_percent"
@@ -867,8 +869,10 @@ object AirPlayPersistence {
             .apply()
     }
 
+    // Acceso di default in questo fork: la mappa sul cruscotto è attiva senza doverla accendere a mano
+    // (chi l'ha spenta a mano mantiene la scelta, perché la chiave risulta salvata a false).
     fun loadClusterMapEnabled(context: Context): Boolean =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLUSTER_MAP, false)
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLUSTER_MAP, true)
 
     fun loadAdbClusterEnabled(context: Context): Boolean = loadClusterMapEnabled(context) &&
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ADB_CLUSTER_ACTIVITY, false)
@@ -1031,7 +1035,7 @@ object AirPlayPersistence {
     fun loadClusterContent(context: Context): CarPlayClusterDisplay.Content =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_CLUSTER_CONTENT, null)
             ?.let { name -> CarPlayClusterDisplay.Content.entries.firstOrNull { it.name == name } }
-            ?: if (AdbClusterRouter.enabled(context) && !loadLegacyClusterEnabled(context)) CarPlayClusterDisplay.Content.INSTRUMENTS else CarPlayClusterDisplay.Content.MAP
+            ?: if (AdbClusterRouter.enabled(context) && !loadLegacyClusterEnabled(context)) CarPlayClusterDisplay.Content.INSTRUMENTS else CarPlayClusterDisplay.Content.MAP_WITH_CUSTOM_CARD
 
     fun saveClusterContent(context: Context, content: CarPlayClusterDisplay.Content) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_CLUSTER_CONTENT, content.name).apply()
@@ -1286,6 +1290,28 @@ object AirPlayPersistence {
     fun saveClusterDimPercent(context: Context, percent: Int) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putInt(KEY_CLUSTER_DIM, percent.coerceIn(0, 100)).apply()
+        overlaySettingsListener?.invoke()
+    }
+
+    /** Calore (tinta ambra) della mappa sul cruscotto, 0 (neutro) a 100 (molto caldo). */
+    fun loadClusterWarmthPercent(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_CLUSTER_WARMTH, 0).coerceIn(0, 100)
+
+    fun saveClusterWarmthPercent(context: Context, percent: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_CLUSTER_WARMTH, percent.coerceIn(0, 100)).apply()
+        overlaySettingsListener?.invoke()
+    }
+
+    /** Morbidezza (contrasto ridotto) della mappa sul cruscotto, 0 (normale) a 100 (molto morbido). */
+    fun loadClusterSoftPercent(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_CLUSTER_SOFT, 0).coerceIn(0, 100)
+
+    fun saveClusterSoftPercent(context: Context, percent: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_CLUSTER_SOFT, percent.coerceIn(0, 100)).apply()
         overlaySettingsListener?.invoke()
     }
 

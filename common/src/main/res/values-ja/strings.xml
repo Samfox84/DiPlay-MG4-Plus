@@ -1063,4 +1063,6 @@
     <string name="settings_cluster_level_light">弱</string>
     <string name="settings_cluster_level_medium">中</string>
     <string name="settings_cluster_level_strong">強</string>
+    <string name="settings_cluster_warmth">メータークラスターの地図を暖色に</string>
+    <string name="settings_cluster_soft">メータークラスターの地図を柔らかく</string>
 </resources>

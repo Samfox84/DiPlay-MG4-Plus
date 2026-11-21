@@ -39,6 +39,9 @@ class ClusterSettingsConsentTest {
         val app = RuntimeEnvironment.getApplication()
         app.getSharedPreferences("xcertplay_airplay", 0).edit().clear().commit()
         app.getSharedPreferences("diplay", 0).edit().clear().commit()
+        // La mappa sul cruscotto ora è accesa di default; questi test verificano il flusso di consenso a partire
+        // dallo stato spento, quindi lo forziamo spento esplicitamente.
+        AirPlayPersistence.saveClusterMapEnabled(app, false)
         // These existing sessions have already answered the optional notification prompt.
         app.getSharedPreferences("diplay", 0).edit().putBoolean("notification_asked", true).commit()
         PendingReconnect.clear()

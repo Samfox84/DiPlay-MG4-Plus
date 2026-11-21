@@ -60,6 +60,8 @@ internal class ClusterMapPresentation(
     // the legacy SurfaceView path composites outside the view hierarchy and is left untouched.
     private var greyPercent = 0
     private var dimPercent = 0
+    private var warmthPercent = 0   // tinta ambra: toglie il blu "freddo", più riposante per gli occhi
+    private var softPercent = 0     // riduce il contrasto: bianchi meno aggressivi
 
     private val projectionHandler = Handler(Looper.getMainLooper())
     private val projectionWatchdog = ClusterProjectionWatchdog()
@@ -176,29 +178,52 @@ internal class ClusterMapPresentation(
      * Sets the greyscale and dim amount for the cluster map. Applies live when a session is running.
      * grey/dim are 0..100. Independent of the nav app: it recolours the video pixels, not the data.
      */
-    fun setColorFilter(grey: Int, dim: Int) {
+    fun setColorFilter(grey: Int, dim: Int, warmth: Int = warmthPercent, soft: Int = softPercent) {
         greyPercent = grey.coerceIn(0, 100)
         dimPercent = dim.coerceIn(0, 100)
+        warmthPercent = warmth.coerceIn(0, 100)
+        softPercent = soft.coerceIn(0, 100)
         applyColorFilter()
     }
 
     private fun applyColorFilter() {
         // Only the TextureView path honours a layer colour filter; leave the legacy SurfaceView alone.
         val view = videoView as? TextureView ?: return
-        if (greyPercent <= 0 && dimPercent <= 0) {
+        if (greyPercent <= 0 && dimPercent <= 0 && warmthPercent <= 0 && softPercent <= 0) {
             view.setLayerType(View.LAYER_TYPE_NONE, null)
             return
         }
-        val saturation = 1f - greyPercent / 100f
-        // Dim knocks brightness down to at most 45% at full, so the cluster is never driven to black.
+        // 1) scala di grigi
+        val matrix = ColorMatrix().apply { setSaturation(1f - greyPercent / 100f) }
+        // 2) attenuazione: al massimo scende al 45% di luminosità, mai nero pieno
         val brightness = 1f - (dimPercent / 100f) * 0.55f
-        val matrix = ColorMatrix().apply { setSaturation(saturation) }
         matrix.postConcat(ColorMatrix(floatArrayOf(
             brightness, 0f, 0f, 0f, 0f,
             0f, brightness, 0f, 0f, 0f,
             0f, 0f, brightness, 0f, 0f,
             0f, 0f, 0f, 1f, 0f,
         )))
+        // 3) calore (ambra): alza un po' il rosso, abbassa il blu; toglie il blu freddo
+        if (warmthPercent > 0) {
+            val w = warmthPercent / 100f
+            matrix.postConcat(ColorMatrix(floatArrayOf(
+                1f + 0.25f * w, 0f, 0f, 0f, 0f,
+                0f, 1f + 0.05f * w, 0f, 0f, 0f,
+                0f, 0f, 1f - 0.30f * w, 0f, 0f,
+                0f, 0f, 0f, 1f, 0f,
+            )))
+        }
+        // 4) morbidezza: riduce il contrasto tirando verso il grigio medio (bianchi meno aggressivi)
+        if (softPercent > 0) {
+            val c = 1f - (softPercent / 100f) * 0.5f
+            val t = 128f * (1f - c)
+            matrix.postConcat(ColorMatrix(floatArrayOf(
+                c, 0f, 0f, 0f, t,
+                0f, c, 0f, 0f, t,
+                0f, 0f, c, 0f, t,
+                0f, 0f, 0f, 1f, 0f,
+            )))
+        }
         view.setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply {
             colorFilter = ColorMatrixColorFilter(matrix)
         })

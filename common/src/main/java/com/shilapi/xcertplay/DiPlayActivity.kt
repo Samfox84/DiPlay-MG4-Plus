@@ -2231,6 +2231,20 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                     dimIndex, reconnects = false) { index ->
                     AirPlayPersistence.saveClusterDimPercent(this, dimLevels[index])
                 }
+                val warmthLevels = listOf(0, 35, 65, 100)
+                val warmthCurrent = AirPlayPersistence.loadClusterWarmthPercent(this)
+                val warmthIndex = warmthLevels.indices.minByOrNull { Math.abs(warmthLevels[it] - warmthCurrent) } ?: 0
+                choice(card, getString(R.string.settings_cluster_warmth), clusterLevelNames,
+                    warmthIndex, reconnects = false) { index ->
+                    AirPlayPersistence.saveClusterWarmthPercent(this, warmthLevels[index])
+                }
+                val softLevels = listOf(0, 35, 65, 100)
+                val softCurrent = AirPlayPersistence.loadClusterSoftPercent(this)
+                val softIndex = softLevels.indices.minByOrNull { Math.abs(softLevels[it] - softCurrent) } ?: 0
+                choice(card, getString(R.string.settings_cluster_soft), clusterLevelNames,
+                    softIndex, reconnects = false) { index ->
+                    AirPlayPersistence.saveClusterSoftPercent(this, softLevels[index])
+                }
                 toggle(card, getString(R.string.center_map_card),
                     if (clusterDisplay != null || adbCluster) getString(R.string.center_map_card_description)
                     else getString(R.string.center_map_card_virtual_description),

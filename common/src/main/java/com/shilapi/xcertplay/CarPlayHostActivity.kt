@@ -1513,12 +1513,14 @@ open class CarPlayHostActivity : ComponentActivity() {
         val presentations = (clusterLayers.values + listOfNotNull(clusterPresentation)).distinct()
         val clusterGrey = AirPlayPersistence.loadClusterGreyscalePercent(this)
         val clusterDim = AirPlayPersistence.loadClusterDimPercent(this)
+        val clusterWarmth = AirPlayPersistence.loadClusterWarmthPercent(this)
+        val clusterSoft = AirPlayPersistence.loadClusterSoftPercent(this)
         for (presentation in presentations) {
             presentation.setTurnCardOverlay(xPercent, yPercent, sizePercent)
             presentation.setTurnCardOpacity(effectiveOpacity)
             presentation.setTurnCardNightMode(effectiveNight)
             presentation.setTurnCardGuidance(if (overlay) clusterTurnGuidance else null)
-            presentation.setColorFilter(clusterGrey, clusterDim)
+            presentation.setColorFilter(clusterGrey, clusterDim, clusterWarmth, clusterSoft)
         }
     }
     private fun dismissClusterPresentation() {
