@@ -22,6 +22,14 @@ jobs:
         with:
           packages: platform-tools platforms;android-37.0 build-tools;36.0.0 ndk;28.2.13676358
       - uses: gradle/actions/setup-gradle@v4
+      - name: Provision local CarPlay identity (recovered from public Carlinkit firmware; not stored in source)
+        run: |
+          mkdir -p common/src/main/assets/offline-mfi
+          printf '%s' "$MFI_IDENTITY_B64" | base64 -d > common/src/main/assets/offline-mfi/identity.pk8
+          printf '%s' "$MFI_CERT_B64" | base64 -d > common/src/main/assets/offline-mfi/certificate.p7b
+        env:
+          MFI_IDENTITY_B64: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAv4C+7aHy52zIUZMW2bAJVb+f2A+E88wS9ep/vXJi6hg==
+          MFI_CERT_B64: MIICWwYJKoZIhvcNAQcCoIICTDCCAkgCAQExADALBgkqhkiG9w0BBwGgggIuMIICKjCCAdGgAwIBAgIQJKy7SGRvgHf3RjUjCFtg0jAKBggqhkjOPQQDAjCBiTELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsTHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MT0wOwYDVQQDEzRBcHBsZSBBY2Nlc3NvcmllcyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eSAtIDAwMDAwMDAyMB4XDTE4MDYxMzA4MzI1OVoXDTQ5MTIzMTIzNTk1OVowbTELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xGjAYBgNVBAsTEUFwcGxlIEFjY2Vzc29yaWVzMS0wKwYDVQQDFCRJUEFfMjRBQ0JCNDg2NDZGODA3N0Y3NDYzNTIzMDg1QjYwRDIwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAT0mPfItJFateYmSe89Z9Bpf4HwogWewlz3ZfUgQkbuxvuvw9vGmuyMlitYkr7QNJM9/J4shFRgN1GesptbVnEpozYwNDAyBgkqhkiG92NkBiQBAf8EIgQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIwCgYIKoZIzj0EAwIDRwAwRAIgaYL03y8Xje/EKdEqhBoRJLB071JCP69YmNOQXVv+qfkCIFngsPKacTAAVavi1E47l28ltIQslTc7ABuQ5c+lt47AoQAxAA==
       - name: Unit tests, lint and source-only debug build
         run: ./gradlew :shared:testDebugUnitTest :common:testDebugUnitTest :home:testDebugUnitTest :mobile:lintDebug :home:lintDebug :maphost:lintDebug :mobile:assembleDebug :home:assembleDebug :maphost:assembleDebug --stacktrace
       - name: Upload DiPlay mobile debug APK
