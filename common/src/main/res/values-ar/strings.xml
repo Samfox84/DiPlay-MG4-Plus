@@ -1003,4 +1003,11 @@
     <string name="cluster_projection_shape_description">يُبقي وضع نصف الشاشة السرعة وحالة السيارة اللتين تعرضهما اللوحة عادةً بجانب الخريطة؛ أما ملء الشاشة فتغطي الخريطة اللوحة بالكامل. يضبط DiPlay هذا الشكل عند ظهور خريطة CarPlay، وإلا فإنه يلغي الشكل المختار في السيارة. يتطلب ADB عبر الشبكة على وحدة القيادة.</string>
     <string name="settings_cluster_speedometer_album_color">استخدام لون الألبوم لخلفية عداد السرعة</string>
     <string name="settings_cluster_speedometer_album_color_description">يطابق لون إطار الألبوم بانتقالات سلسة مع الحفاظ على التعتيم المحدد.</string>
+    <string name="settings_cluster_greyscale">خريطة اللوحة بالأبيض والأسود</string>
+    <string name="settings_cluster_dim">تعتيم خريطة اللوحة</string>
+    <string name="settings_cluster_calm_description">أعد تلوين خريطة اللوحة لتقليل الحمل البصري. تعمل مع أي تطبيق ملاحة.</string>
+    <string name="settings_cluster_level_off">إيقاف</string>
+    <string name="settings_cluster_level_light">خفيف</string>
+    <string name="settings_cluster_level_medium">متوسط</string>
+    <string name="settings_cluster_level_strong">قوي</string>
 </resources>

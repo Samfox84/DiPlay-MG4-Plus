@@ -1057,4 +1057,11 @@
     <string name="cluster_projection_shape_description">Half screen keeps the speed and status readouts the cluster normally shows beside the map; full screen lets the map fill the cluster. DiPlay sets the shape whenever the CarPlay map appears, which otherwise overrides the shape picked on the car. Needs ADB over network on the head unit.</string>
     <string name="settings_cluster_speedometer_album_color">Use album color for speedometer background</string>
     <string name="settings_cluster_speedometer_album_color_description">Match the album frame color with smooth transitions. Keeps the selected opacity.</string>
+    <string name="settings_cluster_greyscale">Greyscale cluster map</string>
+    <string name="settings_cluster_dim">Dim cluster map</string>
+    <string name="settings_cluster_calm_description">Recolour the cluster map to reduce visual load. Works with any navigation app.</string>
+    <string name="settings_cluster_level_off">Off</string>
+    <string name="settings_cluster_level_light">Light</string>
+    <string name="settings_cluster_level_medium">Medium</string>
+    <string name="settings_cluster_level_strong">Strong</string>
 </resources>

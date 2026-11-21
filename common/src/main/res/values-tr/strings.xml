@@ -1042,4 +1042,11 @@
     <string name="wifi_direct_channel_unavailable">Wi-Fi Direct tercih edilen kanalı kullanamıyor</string>
     <string name="settings_existing_wifi_interface">Ağ arayüzü (isteğe bağlı)</string>
     <string name="settings_existing_wifi_interface_description">Yalnızca yerel ağ (LAN) bağlantısı Android\'in Wi-Fi olarak bildirmediği bir arayüzde (örneğin eth1 üzerindeki bir USB ağ kartı) çalışan üniteler içindir. Otomatik seçilmesi için boş bırakın.</string>
+    <string name="settings_cluster_greyscale">Gösterge paneli haritası gri tonlama</string>
+    <string name="settings_cluster_dim">Gösterge paneli haritasını karart</string>
+    <string name="settings_cluster_calm_description">Görsel yükü azaltmak için gösterge paneli haritasını yeniden renklendirir. Her navigasyon uygulamasıyla çalışır.</string>
+    <string name="settings_cluster_level_off">Kapalı</string>
+    <string name="settings_cluster_level_light">Hafif</string>
+    <string name="settings_cluster_level_medium">Orta</string>
+    <string name="settings_cluster_level_strong">Güçlü</string>
 </resources>

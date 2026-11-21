@@ -2211,6 +2211,26 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             if (clusterMapEnabled) {
                 clusterSpeedometerControls(card)
                 clusterMusicControls(card)
+                // Greyscale and dim recolour the cluster video pixels, so they work with any nav app
+                // (Waze, Apple Maps, Google Maps). Applied live; no reconnection needed.
+                card.addView(label(getString(R.string.settings_cluster_calm_description), 14, MUTED))
+                val clusterLevelNames = listOf(getString(R.string.settings_cluster_level_off),
+                    getString(R.string.settings_cluster_level_light), getString(R.string.settings_cluster_level_medium),
+                    getString(R.string.settings_cluster_level_strong))
+                val greyLevels = listOf(0, 40, 70, 100)
+                val greyCurrent = AirPlayPersistence.loadClusterGreyscalePercent(this)
+                val greyIndex = greyLevels.indices.minByOrNull { Math.abs(greyLevels[it] - greyCurrent) } ?: 0
+                choice(card, getString(R.string.settings_cluster_greyscale), clusterLevelNames,
+                    greyIndex, reconnects = false) { index ->
+                    AirPlayPersistence.saveClusterGreyscalePercent(this, greyLevels[index])
+                }
+                val dimLevels = listOf(0, 35, 65, 100)
+                val dimCurrent = AirPlayPersistence.loadClusterDimPercent(this)
+                val dimIndex = dimLevels.indices.minByOrNull { Math.abs(dimLevels[it] - dimCurrent) } ?: 0
+                choice(card, getString(R.string.settings_cluster_dim), clusterLevelNames,
+                    dimIndex, reconnects = false) { index ->
+                    AirPlayPersistence.saveClusterDimPercent(this, dimLevels[index])
+                }
                 toggle(card, getString(R.string.center_map_card),
                     if (clusterDisplay != null || adbCluster) getString(R.string.center_map_card_description)
                     else getString(R.string.center_map_card_virtual_description),

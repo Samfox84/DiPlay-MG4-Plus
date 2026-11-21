@@ -1056,4 +1056,11 @@
     <string name="cluster_projection_shape_description">小画面ではメーター本来の車速や状態表示が地図の横に残ります。全画面では地図がメーター全体を覆います。CarPlayの地図が表示されるとDiPlayがこの形態を設定するため、クルマ側で選んだナビモードは上書きされます。車載機のネットワークADBが必要です。</string>
     <string name="settings_cluster_speedometer_album_color">速度計の背景にアルバムの色を使用</string>
     <string name="settings_cluster_speedometer_album_color_description">アルバムの枠の色に滑らかに切り替わります。選択した不透明度は維持されます。</string>
+    <string name="settings_cluster_greyscale">メータークラスターの地図をグレースケール</string>
+    <string name="settings_cluster_dim">メータークラスターの地図を暗くする</string>
+    <string name="settings_cluster_calm_description">視覚的な負荷を減らすためにクラスター地図の色を調整します。どのナビアプリでも動作します。</string>
+    <string name="settings_cluster_level_off">オフ</string>
+    <string name="settings_cluster_level_light">弱</string>
+    <string name="settings_cluster_level_medium">中</string>
+    <string name="settings_cluster_level_strong">強</string>
 </resources>

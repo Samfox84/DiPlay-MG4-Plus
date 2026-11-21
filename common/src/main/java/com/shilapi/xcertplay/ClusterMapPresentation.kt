@@ -3,6 +3,8 @@ package com.shilapi.xcertplay
 import android.app.Presentation
 import android.content.Context
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.LinearGradient
@@ -53,6 +55,11 @@ internal class ClusterMapPresentation(
         private set
     var mapVisible = true
         private set
+    // Greyscale (0 = full colour, 100 = fully grey) and dim (0 = full brightness, 100 = dimmest)
+    // applied to the cluster video. Only a TextureView can be recoloured by a layer colour filter;
+    // the legacy SurfaceView path composites outside the view hierarchy and is left untouched.
+    private var greyPercent = 0
+    private var dimPercent = 0
 
     private val projectionHandler = Handler(Looper.getMainLooper())
     private val projectionWatchdog = ClusterProjectionWatchdog()
@@ -161,7 +168,40 @@ internal class ClusterMapPresentation(
             alpha = if (streamActive) 0f else 1f
             visibility = if (streamActive) View.GONE else View.VISIBLE
         }
+        applyColorFilter()
         setContentView(root)
+    }
+
+    /**
+     * Sets the greyscale and dim amount for the cluster map. Applies live when a session is running.
+     * grey/dim are 0..100. Independent of the nav app: it recolours the video pixels, not the data.
+     */
+    fun setColorFilter(grey: Int, dim: Int) {
+        greyPercent = grey.coerceIn(0, 100)
+        dimPercent = dim.coerceIn(0, 100)
+        applyColorFilter()
+    }
+
+    private fun applyColorFilter() {
+        // Only the TextureView path honours a layer colour filter; leave the legacy SurfaceView alone.
+        val view = videoView as? TextureView ?: return
+        if (greyPercent <= 0 && dimPercent <= 0) {
+            view.setLayerType(View.LAYER_TYPE_NONE, null)
+            return
+        }
+        val saturation = 1f - greyPercent / 100f
+        // Dim knocks brightness down to at most 45% at full, so the cluster is never driven to black.
+        val brightness = 1f - (dimPercent / 100f) * 0.55f
+        val matrix = ColorMatrix().apply { setSaturation(saturation) }
+        matrix.postConcat(ColorMatrix(floatArrayOf(
+            brightness, 0f, 0f, 0f, 0f,
+            0f, brightness, 0f, 0f, 0f,
+            0f, 0f, brightness, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f,
+        )))
+        view.setLayerType(View.LAYER_TYPE_HARDWARE, Paint().apply {
+            colorFilter = ColorMatrixColorFilter(matrix)
+        })
     }
 
     override fun onStart() {

@@ -109,6 +109,8 @@ object AirPlayPersistence {
     private const val KEY_CLUSTER_SMALL_WINDOW_MARKER_X = "cluster_small_window_marker_x"
     private const val KEY_CLUSTER_SMALL_WINDOW_MARKER_Y = "cluster_small_window_marker_y"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_POSITION = "cluster_turn_card_overlay_position"
+    private const val KEY_CLUSTER_GREYSCALE = "cluster_greyscale_percent"
+    private const val KEY_CLUSTER_DIM = "cluster_dim_percent"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_SIZE = "cluster_turn_card_overlay_size"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_X = "cluster_turn_card_overlay_x_percent"
     private const val KEY_CLUSTER_TURN_CARD_OVERLAY_Y = "cluster_turn_card_overlay_y_percent"
@@ -1262,6 +1264,28 @@ object AirPlayPersistence {
     fun saveClusterTurnCardOpacityPercent(context: Context, percent: Int) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putInt(KEY_CLUSTER_TURN_CARD_OPACITY, percent.coerceIn(20, 100)).apply()
+        overlaySettingsListener?.invoke()
+    }
+
+    /** Greyscale amount for the cluster map, 0 (full colour) to 100 (fully grey). */
+    fun loadClusterGreyscalePercent(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_CLUSTER_GREYSCALE, 0).coerceIn(0, 100)
+
+    fun saveClusterGreyscalePercent(context: Context, percent: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_CLUSTER_GREYSCALE, percent.coerceIn(0, 100)).apply()
+        overlaySettingsListener?.invoke()
+    }
+
+    /** Dim amount for the cluster map, 0 (full brightness) to 100 (dimmest). */
+    fun loadClusterDimPercent(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getInt(KEY_CLUSTER_DIM, 0).coerceIn(0, 100)
+
+    fun saveClusterDimPercent(context: Context, percent: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_CLUSTER_DIM, percent.coerceIn(0, 100)).apply()
         overlaySettingsListener?.invoke()
     }
 
