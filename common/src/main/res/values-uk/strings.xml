@@ -974,5 +974,5 @@
     <string name="settings_cluster_level_medium">Помірно</string>
     <string name="settings_cluster_level_strong">Сильно</string>
     <string name="settings_cluster_warmth">Тепліша карта на панелі приладів</string>
-    <string name="settings_cluster_soft">Пом'якшити карту на панелі приладів</string>
+    <string name="settings_cluster_soft">Пом\'якшити карту на панелі приладів</string>
 </resources>
