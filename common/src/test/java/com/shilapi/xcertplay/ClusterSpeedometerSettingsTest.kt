@@ -95,6 +95,8 @@ class ClusterSpeedometerSettingsTest {
                 else if (view is android.widget.TextView) listOf(view.text.toString()) else emptyList()
             return texts(activity.window.decorView).contains(activity.getString(id))
         }
+        // La mappa sul cruscotto ora è accesa di default; qui si verifica lo stato spento, quindi la forziamo spenta.
+        AirPlayPersistence.saveClusterMapEnabled(context, false)
         ReflectionHelpers.callInstanceMethod<Unit>(activity, "render")
         assertFalse(hasToggle())
         AirPlayPersistence.saveClusterMapEnabled(context, true)
