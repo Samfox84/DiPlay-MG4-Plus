@@ -19,7 +19,7 @@ android {
         targetSdk = 37
         // Bumped above the installed grey build (141) so the launcher can offer an in-place update,
         // re-signed with the platform key. Keep future builds monotonic (143, 144, ...).
-        versionCode = 142
+        versionCode = 143
         versionName = "0.2.22-mg4-grey-mic"
 
     }
