@@ -564,6 +564,7 @@ class AndroidMediaSink(
             val uplink = microphoneUplinks.computeIfAbsent(id) {
                 MicrophoneUplink(config, onAudioDiagnostic,
                     speakerphoneCall = speakerphoneCall,
+                    saicHeadUnit = appContext?.let { com.shilapi.xcertplay.network.SaicHeadUnit.detected(it) } ?: false,
                     echoReference = if (config.audioType == TELEPHONY_AUDIO_TYPE) callEchoReferences[id] else null,
                     audioManager = audioManager)
             }

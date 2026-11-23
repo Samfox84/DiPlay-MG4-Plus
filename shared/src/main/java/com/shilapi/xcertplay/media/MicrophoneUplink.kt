@@ -30,6 +30,8 @@ internal class MicrophoneUplink(
     private val config: MicrophoneConfig,
     private val onDiagnostic: (String) -> Unit = {},
     private val speakerphoneCall: Boolean = false,
+    /** True on an MG/SAIC head unit: Siri captures the plain MIC source with the SSE_AA_VR mic-routing flag. */
+    private val saicHeadUnit: Boolean = false,
     /** The call's far-end audio; when set, telephony capture runs DiPlay's own echo canceller. */
     private val echoReference: EchoReference? = null,
     private val echoCancellerFactory: (Int, Int, Int) -> CallEchoCanceller? = { frame, rate, tail ->
@@ -85,14 +87,14 @@ internal class MicrophoneUplink(
                 carPhoneState = PhoneAudioRoute.carPlayCallsUseCarAudio(),
                 geelyHeadUnit = com.shilapi.xcertplay.network.GeelyHeadUnit.detected,
             )
-            // The Geely/Lynk head unit only opens the microphone for the voice-communication
-            // source; its voice-recognition source records silence, so Siri never hears.
+            // Geely and SAIC/MG head units record silence on the voice-recognition source, so Siri never
+            // hears. Geely opens the microphone for voice-communication; SAIC/MG uses the plain MIC source
+            // (with the SSE_AA_VR routing flag set below), matching its own CarPlay recorder.
             config.audioType == "speechrecognition" ->
-                if (com.shilapi.xcertplay.network.GeelyHeadUnit.detected) {
-                    MediaRecorder.AudioSource.VOICE_COMMUNICATION
-                } else {
-                    MediaRecorder.AudioSource.VOICE_RECOGNITION
-                }
+                speechRecognitionMicrophoneSource(
+                    geelyHeadUnit = com.shilapi.xcertplay.network.GeelyHeadUnit.detected,
+                    saicHeadUnit = saicHeadUnit,
+                )
             else -> MediaRecorder.AudioSource.MIC
         }
         stats.useSource(source)
@@ -114,6 +116,9 @@ internal class MicrophoneUplink(
             runCatching { onDiagnostic(message) }
         }
         val bufferSize = maxOf(minBuffer * 2, config.frameBytes * 4)
+        // SAIC/MG only routes the microphone to a recording app while this vendor flag is set, and its own
+        // recorder sets it before opening the AudioRecord, so do the same here (no-op on other head units).
+        setSaicVrMicRouting(true)
         // Some head units throw on VOICE_RECOGNITION at build(); VOICE_COMMUNICATION works there.
         val nextRecorder = createRecorder(source, channelMask, bufferSize)
             ?: if (source == MediaRecorder.AudioSource.VOICE_RECOGNITION) {
@@ -123,6 +128,7 @@ internal class MicrophoneUplink(
                 null
             }
         if (nextRecorder == null) {
+            setSaicVrMicRouting(false)
             nextEncoder?.close()
             running.set(false)
             return false
@@ -136,6 +142,7 @@ internal class MicrophoneUplink(
         } catch (error: Exception) {
             Log.e(TAG, "microphone socket creation failed", error)
             stats.failure(MicrophoneFailureStage.SOCKET_CREATION, error)
+            setSaicVrMicRouting(false)
             nextRecorder.release()
             nextEncoder?.close()
             running.set(false)
@@ -496,8 +503,23 @@ internal class MicrophoneUplink(
         release()
     }
 
+    /**
+     * The MG/SAIC head unit only routes the microphone to a recording app while this vendor AudioManager
+     * flag is set; its own CarPlay/projection recorder (`AapAudioRecorder`) sets it around capture. Without
+     * it every source records silence. Wireless receiver → `SSE_AA_VR_Wifi`. Best-effort: the key is ignored
+     * on other head units, and only the speech-recognition (Siri) path needs it.
+     */
+    private fun setSaicVrMicRouting(on: Boolean) {
+        if (!saicHeadUnit || config.audioType != "speechrecognition") return
+        val am = audioManager ?: return
+        runCatching { am.setParameters("SSE_AA_VR_Wifi=$on") }
+            .onFailure { Log.w(TAG, "microphone SAIC VR mic routing ${if (on) "enable" else "disable"} failed", it) }
+        runCatching { onDiagnostic("Microphone: SAIC VR mic routing ${if (on) "on" else "off"}") }
+    }
+
     @Synchronized
     private fun release() {
+        setSaicVrMicRouting(false)
         running.set(false)
         val currentEffects = effects
         effects = emptyList()
@@ -545,6 +567,18 @@ internal class MicrophoneUplink(
  * service ends up with, gives a normal level with no clipping, and the car still suppresses the far end's
  * echo on it. Geely/Lynk head units record silence on VOICE_RECOGNITION, so they keep the old choice.
  */
+/**
+ * The recorder source for Siri / speech recognition. SAIC/MG and Geely head units record silence on
+ * VOICE_RECOGNITION. SAIC/MG captures the plain MIC source (its own CarPlay recorder does, alongside the
+ * SSE_AA_VR routing flag); Geely opens the microphone for VOICE_COMMUNICATION. Every other head unit keeps
+ * VOICE_RECOGNITION, which is what the stock CarPlay service uses and which works there.
+ */
+internal fun speechRecognitionMicrophoneSource(geelyHeadUnit: Boolean, saicHeadUnit: Boolean): Int = when {
+    saicHeadUnit -> MediaRecorder.AudioSource.MIC
+    geelyHeadUnit -> MediaRecorder.AudioSource.VOICE_COMMUNICATION
+    else -> MediaRecorder.AudioSource.VOICE_RECOGNITION
+}
+
 internal fun telephonyMicrophoneSource(speakerphoneCall: Boolean, carPhoneState: Boolean, geelyHeadUnit: Boolean): Int = when {
     carPhoneState && !geelyHeadUnit -> MediaRecorder.AudioSource.VOICE_RECOGNITION
     speakerphoneCall -> MediaRecorder.AudioSource.MIC
